@@ -10,6 +10,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
   <script src="https://unpkg.com/lucide@latest"></script>
   <style>
+    /* スマホでの横揺れ・上下バウンス・勝手な拡大を完全に防ぐベース設定 */
     html, body {
       font-family: 'Inter', 'Noto Sans JP', sans-serif;
       overflow-x: hidden;
@@ -23,11 +24,13 @@
       -webkit-text-size-adjust: 100%;
     }
 
+    /* iOS Safari等でフォームタップ時に勝手なズーム拡大を防ぐため16px固定 */
     input, select, textarea {
       font-size: 16px !important;
       min-width: 0;
     }
 
+    /* 数値入力の標準スピナー非表示 */
     input[type="number"]::-webkit-inner-spin-button,
     input[type="number"]::-webkit-outer-spin-button {
       -webkit-appearance: none;
@@ -37,12 +40,14 @@
       -moz-appearance: textfield;
     }
 
+    /* ボタン連打時のダブルタップズーム防止 */
     button, label, [role="button"] {
       touch-action: manipulation;
       user-select: none;
       -webkit-user-select: none;
     }
 
+    /* 横スクロールカテゴリータブの独立制御 */
     .horizontal-scroll-tabs {
       display: flex;
       overflow-x: auto;
@@ -57,11 +62,13 @@
       display: none;
     }
 
+    /* 日本語の自然な改行制御 */
     .jp-wrap {
       word-break: keep-all;
       overflow-wrap: anywhere;
     }
 
+    /* スライダーのアクセントカラー */
     input[type="range"] {
       accent-color: #1B6B50;
       touch-action: pan-x;
@@ -81,11 +88,11 @@
 </head>
 <body>
 
-  <!-- トースト通知 -->
+  <!-- トースト通知エリア -->
   <div id="toast-container" class="fixed top-4 left-1/2 -translate-x-1/2 z-50 w-11/12 max-w-[440px] pointer-events-none flex flex-col gap-2"></div>
 
-  <!-- メインコンテナ -->
-  <div class="max-w-[480px] mx-auto min-h-screen bg-[#faf9f5] shadow-sm relative pb-24 overflow-x-hidden flex flex-col">
+  <!-- メインコンテナ（スマホ幅中央固定・最下部カードと下部バー干渉防止のため pb-32 を確保） -->
+  <div class="max-w-[480px] mx-auto min-h-screen bg-[#faf9f5] shadow-sm relative pb-32 overflow-x-hidden flex flex-col">
 
     <!-- ヘッダー -->
     <header class="sticky top-0 z-30 w-full bg-white/95 backdrop-blur-md border-b border-stone-200/80 shadow-2xs">
@@ -96,7 +103,7 @@
           </div>
           <h1 class="font-bold text-base tracking-tight text-stone-800 truncate">わが家の備蓄管理</h1>
         </div>
-        <button onclick="switchTab('settings')" class="text-xs font-bold bg-emerald-50 text-[#1B6B50] border border-emerald-200 px-3 py-1.5 rounded-full flex items-center gap-1.5 hover:bg-emerald-100 transition active:scale-95 whitespace-nowrap shrink-0">
+        <button type="button" onclick="switchTab('settings')" class="text-xs font-bold bg-emerald-50 text-[#1B6B50] border border-emerald-200 px-3 py-1.5 rounded-full flex items-center gap-1.5 hover:bg-emerald-100 transition active:scale-95 whitespace-nowrap shrink-0">
           <i data-lucide="users" class="w-3.5 h-3.5 shrink-0"></i>
           <span id="header-family-summary">2人 × 30日</span>
         </button>
@@ -105,31 +112,31 @@
 
     <!-- コンテンツ描画エリア -->
     <main id="app" class="px-4 pt-4 flex-1 overflow-x-hidden min-w-0">
-      <!-- JSで描画 -->
+      <!-- JSで各画面を描画 -->
     </main>
 
-    <!-- 下部固定ナビゲーション -->
+    <!-- 下部固定5タブナビゲーション -->
     <nav class="fixed bottom-0 left-0 right-0 z-30 w-full bg-white border-t border-stone-200 shadow-lg pb-[env(safe-area-inset-bottom)]">
       <div class="w-full max-w-[480px] mx-auto grid grid-cols-5 h-16">
-        <button onclick="switchTab('home')" data-nav="home" class="nav-btn flex flex-col items-center justify-center gap-1 text-[#1B6B50] font-semibold transition">
+        <button type="button" onclick="switchTab('home')" data-nav="home" class="nav-btn flex flex-col items-center justify-center gap-1 text-[#1B6B50] font-semibold transition">
           <i data-lucide="home" class="w-5 h-5"></i>
           <span class="text-[11px] whitespace-nowrap">ホーム</span>
         </button>
-        <button onclick="switchTab('inventory')" data-nav="inventory" class="nav-btn flex flex-col items-center justify-center gap-1 text-stone-400 hover:text-stone-600 transition">
+        <button type="button" onclick="switchTab('inventory')" data-nav="inventory" class="nav-btn flex flex-col items-center justify-center gap-1 text-stone-400 hover:text-stone-600 transition">
           <i data-lucide="package" class="w-5 h-5"></i>
           <span class="text-[11px] whitespace-nowrap">備蓄一覧</span>
         </button>
-        <button onclick="switchTab('expiry')" data-nav="expiry" class="nav-btn relative flex flex-col items-center justify-center gap-1 text-stone-400 hover:text-stone-600 transition">
+        <button type="button" onclick="switchTab('expiry')" data-nav="expiry" class="nav-btn relative flex flex-col items-center justify-center gap-1 text-stone-400 hover:text-stone-600 transition">
           <i data-lucide="calendar-clock" class="w-5 h-5"></i>
           <span class="text-[11px] whitespace-nowrap">期限管理</span>
           <span id="nav-expiry-badge" class="hidden absolute top-2 right-1/4 w-2 h-2 rounded-full bg-amber-500"></span>
         </button>
-        <button onclick="switchTab('shopping')" data-nav="shopping" class="nav-btn relative flex flex-col items-center justify-center gap-1 text-stone-400 hover:text-stone-600 transition">
+        <button type="button" onclick="switchTab('shopping')" data-nav="shopping" class="nav-btn relative flex flex-col items-center justify-center gap-1 text-stone-400 hover:text-stone-600 transition">
           <i data-lucide="shopping-cart" class="w-5 h-5"></i>
           <span class="text-[11px] whitespace-nowrap">買い物</span>
           <span id="nav-shopping-badge" class="hidden absolute top-1.5 right-1/4 bg-rose-500 text-white text-[9px] font-bold px-1.5 rounded-full">0</span>
         </button>
-        <button onclick="switchTab('settings')" data-nav="settings" class="nav-btn flex flex-col items-center justify-center gap-1 text-stone-400 hover:text-stone-600 transition">
+        <button type="button" onclick="switchTab('settings')" data-nav="settings" class="nav-btn flex flex-col items-center justify-center gap-1 text-stone-400 hover:text-stone-600 transition">
           <i data-lucide="settings" class="w-5 h-5"></i>
           <span class="text-[11px] whitespace-nowrap">設定</span>
         </button>
@@ -142,7 +149,7 @@
     <div class="bg-white w-full max-w-[480px] rounded-t-3xl sm:rounded-3xl shadow-2xl max-h-[90vh] flex flex-col overflow-hidden animate-fade-in">
       <div class="px-5 py-4 border-b border-stone-100 flex items-center justify-between bg-stone-50/70 shrink-0">
         <h3 id="modal-title" class="font-bold text-base text-stone-800">品目の編集</h3>
-        <button onclick="closeItemModal()" class="p-2 rounded-full text-stone-400 hover:bg-stone-200/70 hover:text-stone-700 transition">
+        <button type="button" onclick="closeItemModal()" class="p-2 rounded-full text-stone-400 hover:bg-stone-200/70 hover:text-stone-700 transition">
           <i data-lucide="x" class="w-5 h-5"></i>
         </button>
       </div>
@@ -152,7 +159,7 @@
     </div>
   </div>
 
-  <!-- 確認ダイアログモーダル -->
+  <!-- 確認ダイアログモーダル（alert/confirm不使用） -->
   <div id="confirm-modal" class="fixed inset-0 z-50 hidden bg-stone-900/50 backdrop-blur-xs flex items-center justify-center p-4 overscroll-contain">
     <div class="bg-white w-full max-w-sm rounded-3xl p-6 shadow-xl space-y-4 animate-fade-in">
       <div class="flex items-center gap-3 text-amber-600">
@@ -163,17 +170,17 @@
       </div>
       <p id="confirm-message" class="text-sm text-stone-600 leading-relaxed jp-wrap"></p>
       <div class="flex gap-3 pt-2">
-        <button id="confirm-cancel-btn" class="flex-1 py-2.5 px-4 rounded-xl border border-stone-200 text-stone-600 font-medium text-sm hover:bg-stone-50 transition whitespace-nowrap">キャンセル</button>
-        <button id="confirm-ok-btn" class="flex-1 py-2.5 px-4 rounded-xl bg-rose-600 text-white font-medium text-sm hover:bg-rose-700 transition shadow-2xs whitespace-nowrap">実行する</button>
+        <button type="button" id="confirm-cancel-btn" class="flex-1 py-2.5 px-4 rounded-xl border border-stone-200 text-stone-600 font-medium text-sm hover:bg-stone-50 transition whitespace-nowrap">キャンセル</button>
+        <button type="button" id="confirm-ok-btn" class="flex-1 py-2.5 px-4 rounded-xl bg-rose-600 text-white font-medium text-sm hover:bg-rose-700 transition shadow-2xs whitespace-nowrap">実行する</button>
       </div>
     </div>
   </div>
 
   <script>
     // ==========================================
-    // 1. 定数・カテゴリー定義・初期データ
+    // 1. 定数・カテゴリー定義・確定初期データ
     // ==========================================
-    const STORAGE_KEY = 'bichiku_app_v13';
+    const STORAGE_KEY = 'bichiku_app_v14';
 
     const CATEGORIES = [
       { id: 'staple', name: '主食', type: 'food', theme: 'emerald', icon: 'wheat' },
@@ -202,43 +209,43 @@
       },
       checkedShoppingIds: [],
       items: [
-        // 1) 主食 (targetRatio: 100% -> 180 meals, 合計100%)
-        { id: 'st-1', category: 'staple', name: '米', isCombined: false, unit: 'kg', mealsPerUnit: 6.5, ratio: 35, stock: 8, step: 1, expiry: '' },
+        // 1) 主食 (初期割合100% -> 180食, 合計100%)
+        { id: 'st-1', category: 'staple', name: '米', isCombined: false, unit: 'kg', mealsPerUnit: 13, ratio: 35, stock: 5, step: 1, expiry: '' },
         { id: 'st-2', category: 'staple', name: 'パックご飯', isCombined: false, unit: '個', mealsPerUnit: 1, ratio: 15, stock: 24, step: 1, expiry: '' },
         { id: 'st-3', category: 'staple', name: 'パスタ', isCombined: false, unit: '束', mealsPerUnit: 1, ratio: 15, stock: 20, step: 1, expiry: '' },
         { id: 'st-4', category: 'staple', name: 'そうめん', isCombined: false, unit: '束', mealsPerUnit: 0.5, ratio: 10, stock: 30, step: 2, expiry: '' },
         { id: 'st-5', category: 'staple', name: '乾麺うどん', isCombined: false, unit: '束', mealsPerUnit: 1, ratio: 10, stock: 15, step: 1, expiry: '' },
         { id: 'st-6', category: 'staple', name: 'インスタント麺', isCombined: false, unit: '食', mealsPerUnit: 1, ratio: 15, stock: 15, step: 1, expiry: '' },
 
-        // 2) たんぱく質 (targetRatio: 100% -> 180 meals, 合計100%)
-        { id: 'pr-1', category: 'protein', name: 'ツナ缶', isCombined: false, unit: '缶', mealsPerUnit: 1, ratio: 35, stock: 30, step: 1, expiry: '' },
-        { id: 'pr-2', category: 'protein', name: 'サバ缶', isCombined: false, unit: '缶', mealsPerUnit: 1, ratio: 30, stock: 25, step: 1, expiry: '' },
+        // 2) たんぱく質 (初期割合100% -> 180食, 合計100%)
+        { id: 'pr-1', category: 'protein', name: 'ツナ缶', isCombined: false, unit: '缶', mealsPerUnit: 1, ratio: 30, stock: 30, step: 1, expiry: '' },
+        { id: 'pr-2', category: 'protein', name: 'サバ缶', isCombined: false, unit: '缶', mealsPerUnit: 1, ratio: 25, stock: 25, step: 1, expiry: '' },
         { id: 'pr-3', category: 'protein', name: '焼き鳥缶', isCombined: false, unit: '缶', mealsPerUnit: 1, ratio: 20, stock: 18, step: 1, expiry: '' },
-        { id: 'pr-4', category: 'protein', name: '大豆水煮', isCombined: false, unit: '缶', mealsPerUnit: 2, ratio: 15, stock: 10, step: 1, expiry: '' },
+        { id: 'pr-4', category: 'protein', name: '大豆水煮', isCombined: false, unit: '缶', mealsPerUnit: 2, ratio: 25, stock: 12, step: 1, expiry: '' },
 
-        // 3) 野菜・食物繊維 (targetRatio: 80% -> 144 meals, 合計100%)
-        { id: 'vg-1', category: 'vegetable', name: '切り干し大根', isCombined: false, unit: '袋', mealsPerUnit: 3, ratio: 30, stock: 8, step: 1, expiry: '' },
+        // 3) 野菜・食物繊維 (初期割合80% -> 144食, 合計100%)
+        { id: 'vg-1', category: 'vegetable', name: '切り干し大根', isCombined: false, unit: '袋', mealsPerUnit: 4, ratio: 35, stock: 8, step: 1, expiry: '' },
         { id: 'vg-2', category: 'vegetable', name: 'トマト缶', isCombined: false, unit: '缶', mealsPerUnit: 2, ratio: 25, stock: 10, step: 1, expiry: '' },
-        { id: 'vg-3', category: 'vegetable', name: 'コーン缶', isCombined: false, unit: '缶', mealsPerUnit: 1, ratio: 20, stock: 12, step: 1, expiry: '' },
+        { id: 'vg-3', category: 'vegetable', name: 'コーン缶', isCombined: false, unit: '缶', mealsPerUnit: 1, ratio: 15, stock: 12, step: 1, expiry: '' },
         { id: 'vg-4', category: 'vegetable', name: '野菜ジュース', isCombined: false, unit: '本', mealsPerUnit: 1, ratio: 25, stock: 24, step: 1, expiry: '' },
 
-        // 4) 果物・乳製品 (targetRatio: 30% -> 54 meals, 合計100%)
+        // 4) 果物・乳製品 (初期割合30% -> 54食, 合計100%)
         { id: 'fd-1', category: 'fruit_dairy', name: '果物缶詰（みかん・桃など）', isCombined: false, unit: '缶', mealsPerUnit: 2, ratio: 65, stock: 10, step: 1, expiry: '' },
         { id: 'fd-2', category: 'fruit_dairy', name: 'ドライフルーツ', isCombined: false, unit: '袋', mealsPerUnit: 3, ratio: 35, stock: 4, step: 1, expiry: '' },
 
-        // 5) 汁物・その他食品 (targetRatio: 50% -> 90 meals, 合計100%)
-        { id: 'sp-1', category: 'soup_other', name: '即席みそ汁・スープ', isCombined: false, unit: '食', mealsPerUnit: 1, ratio: 50, stock: 30, step: 1, expiry: '' },
-        { id: 'sp-2', category: 'soup_other', name: 'レトルトカレー', isCombined: false, unit: '食', mealsPerUnit: 1, ratio: 30, stock: 12, step: 1, expiry: '' },
-        { id: 'sp-3', category: 'soup_other', name: '丼の素', isCombined: false, unit: '食', mealsPerUnit: 1, ratio: 20, stock: 8, step: 1, expiry: '' },
+        // 5) 汁物・その他食品 (初期割合50% -> 90食, 合計100%)
+        { id: 'sp-1', category: 'soup_other', name: '即席みそ汁・スープ', isCombined: false, unit: '食', mealsPerUnit: 1, ratio: 40, stock: 30, step: 1, expiry: '' },
+        { id: 'sp-2', category: 'soup_other', name: 'レトルトカレー', isCombined: false, unit: '食', mealsPerUnit: 1, ratio: 35, stock: 15, step: 1, expiry: '' },
+        { id: 'sp-3', category: 'soup_other', name: '丼の素', isCombined: false, unit: '食', mealsPerUnit: 1, ratio: 25, stock: 10, step: 1, expiry: '' },
 
-        // 6) お菓子・嗜好品 (targetRatio: 50% -> 90 times/servings, NO '日分', 合計100%)
-        { id: 'sn-1', category: 'snacks', name: 'チョコレート', isCombined: false, unit: '個', mealsPerUnit: 0.5, ratio: 25, stock: 40, step: 2, expiry: '' },
+        // 6) お菓子・嗜好品 (初期割合50% -> 90回分, 「日分」表記なし・回数ベース管理, 合計100%)
+        { id: 'sn-1', category: 'snacks', name: 'チョコレート', isCombined: false, unit: '個', mealsPerUnit: 0.5, ratio: 30, stock: 40, step: 2, expiry: '' },
         { id: 'sn-2', category: 'snacks', name: 'ビスケット・クッキー', isCombined: false, unit: '枚', mealsPerUnit: 0.5, ratio: 25, stock: 30, step: 2, expiry: '' },
         { id: 'sn-3', category: 'snacks', name: '羊羹', isCombined: false, unit: '個', mealsPerUnit: 1, ratio: 10, stock: 6, step: 1, expiry: '' },
         { id: 'sn-4', category: 'snacks', name: '飴類', isCombined: false, unit: '個', mealsPerUnit: 1, ratio: 10, stock: 15, step: 1, expiry: '' },
-        { id: 'sn-5', category: 'snacks', name: 'スティックコーヒー・紅茶', isCombined: false, unit: '本', mealsPerUnit: 1, ratio: 30, stock: 25, step: 1, expiry: '' },
+        { id: 'sn-5', category: 'snacks', name: 'スティックコーヒー・紅茶', isCombined: false, unit: '本', mealsPerUnit: 1, ratio: 25, stock: 25, step: 1, expiry: '' },
 
-        // 7) 水・飲料
+        // 7) 水・飲料（複数サイズ・規格合算管理カード）
         {
           id: 'wt-1',
           category: 'water',
@@ -257,9 +264,9 @@
         { id: 'dl-2', category: 'daily', name: 'ティッシュペーパー', isCombined: false, unit: '箱', perPersonPerDay: 0.1, stock: 5, step: 1, expiry: '' },
         { id: 'dl-3', category: 'daily', name: 'ウェットティッシュ', isCombined: false, unit: 'パック', perPersonPerDay: 0.15, stock: 6, step: 1, expiry: '' },
         { id: 'dl-4', category: 'daily', name: 'カセットガスボンベ', isCombined: false, unit: '本', perHouseholdPerDay: 0.5, stock: 9, step: 1, expiry: '' },
-        { id: 'dl-5', category: 'daily', name: '乾電池（単3形）', isCombined: false, unit: '本', perHouseholdPerDay: 0.4, stock: 10, step: 2, expiry: '' },
+        { id: 'dl-5', category: 'daily', name: '乾電池・単3形', isCombined: false, unit: '本', perHouseholdPerDay: 0.4, stock: 10, step: 2, expiry: '' },
         { id: 'dl-6', category: 'daily', name: '簡易トイレ・非常用トイレ', isCombined: false, unit: '回分', perPersonPerDay: 5, stock: 150, step: 10, expiry: '' },
-        { id: 'dl-7', category: 'daily', name: 'ごみ袋（45L）', isCombined: false, unit: '枚', perHouseholdPerDay: 1, stock: 20, step: 5, expiry: '' }
+        { id: 'dl-7', category: 'daily', name: 'ごみ袋・45L', isCombined: false, unit: '枚', perHouseholdPerDay: 1, stock: 20, step: 5, expiry: '' }
       ]
     };
 
@@ -294,6 +301,7 @@
       try {
         const legacyKeys = [
           STORAGE_KEY,
+          'bichiku_app_v13',
           'bichiku_app_v12',
           'bichiku_app_v11',
           'bichiku_app_v10',
@@ -337,7 +345,7 @@
               };
             }
 
-            // 旧バージョンからの自動移行処理（既存の在庫数・賞味期限・設定を保持）
+            // 旧バージョンからの自動移行処理（在庫・賞味期限・家族設定を維持）
             const migratedItems = [];
             parsed.items.forEach(old => {
               const name = (old.name || '').trim();
@@ -356,7 +364,7 @@
               const expiryVal = old.expiry !== undefined ? old.expiry : (old.expiryDate || '');
               const isComb = Boolean(old.isCombined || old.isMultiVariant);
 
-              // 1) トマト缶・コーン缶の分離
+              // トマト缶・コーン缶の分離
               if (name === 'トマト缶・コーン缶' || (name.includes('トマト缶') && name.includes('コーン缶'))) {
                 const tStock = stockVal > 0 ? Math.max(1, Math.round(stockVal * 0.45)) : 10;
                 const cStock = stockVal > 0 ? Math.max(1, stockVal - tStock) : 12;
@@ -366,27 +374,27 @@
                 });
                 migratedItems.push({
                   id: 'vg-3', category: 'vegetable', name: 'コーン缶', isCombined: false,
-                  unit: '缶', mealsPerUnit: 1, ratio: 20, stock: cStock, step: 1, expiry: expiryVal
+                  unit: '缶', mealsPerUnit: 1, ratio: 15, stock: cStock, step: 1, expiry: expiryVal
                 });
                 return;
               }
 
-              // 2) レトルトカレー・丼の素の分離
+              // レトルトカレー・丼の素の分離
               if (name === 'レトルトカレー・丼の素' || (name.includes('レトルトカレー') && name.includes('丼の素'))) {
-                const curryStock = stockVal > 0 ? Math.ceil(stockVal * 0.6) : 12;
-                const donStock = stockVal > 0 ? Math.max(0, stockVal - curryStock) : 8;
+                const curryStock = stockVal > 0 ? Math.ceil(stockVal * 0.6) : 15;
+                const donStock = stockVal > 0 ? Math.max(0, stockVal - curryStock) : 10;
                 migratedItems.push({
                   id: 'sp-2', category: 'soup_other', name: 'レトルトカレー', isCombined: false,
-                  unit: '食', mealsPerUnit: 1, ratio: 30, stock: curryStock, step: 1, expiry: expiryVal
+                  unit: '食', mealsPerUnit: 1, ratio: 35, stock: curryStock, step: 1, expiry: expiryVal
                 });
                 migratedItems.push({
                   id: 'sp-3', category: 'soup_other', name: '丼の素', isCombined: false,
-                  unit: '食', mealsPerUnit: 1, ratio: 20, stock: donStock, step: 1, expiry: expiryVal
+                  unit: '食', mealsPerUnit: 1, ratio: 25, stock: donStock, step: 1, expiry: expiryVal
                 });
                 return;
               }
 
-              // 3) 羊羹・飴類の分離
+              // 羊羹・飴類の分離
               if (name === '羊羹・飴類' || (name.includes('羊羹') && name.includes('飴'))) {
                 const yokanStock = stockVal > 0 ? Math.max(1, Math.round(stockVal * 0.35)) : 6;
                 const candyStock = stockVal > 0 ? Math.max(1, stockVal - yokanStock) : 15;
@@ -408,28 +416,22 @@
               let stk = stockVal;
               let stp = Number(old.step) || 1;
 
-              // 4) インスタント麺を「主食」へ移動
               if (name === 'インスタント麺' || name.includes('インスタント麺')) {
                 cat = 'staple';
                 newName = 'インスタント麺';
                 unit = '食';
                 mpu = 1;
-              }
-              // 5) サバ・イワシ缶 → サバ缶のみ
-              else if (name === 'サバ・イワシ缶' || (cat === 'protein' && name.includes('サバ'))) {
+              } else if (name === 'サバ・イワシ缶' || (cat === 'protein' && name.includes('サバ'))) {
                 cat = 'protein';
                 newName = 'サバ缶';
                 unit = '缶';
                 mpu = 1;
-              }
-              // 6) 焼き鳥・肉缶詰 → 焼き鳥缶のみ
-              else if (name === '焼き鳥・肉缶詰' || (cat === 'protein' && name.includes('焼き鳥'))) {
+              } else if (name === '焼き鳥・肉缶詰' || (cat === 'protein' && name.includes('焼き鳥'))) {
                 cat = 'protein';
                 newName = '焼き鳥缶';
                 unit = '缶';
                 mpu = 1;
-              }
-              else if (name.includes('野菜ジュース')) {
+              } else if (name.includes('野菜ジュース')) {
                 cat = 'vegetable';
                 newName = '野菜ジュース';
                 unit = '本';
@@ -438,11 +440,14 @@
                 cat = 'vegetable';
                 newName = '切り干し大根';
                 unit = '袋';
-                mpu = 3;
+                mpu = 4;
               } else if (cat === 'protein' && (name.includes('大豆') || old.id === 'pr-4')) {
                 newName = '大豆水煮';
                 unit = '缶';
                 mpu = 2;
+              } else if (newName === '米') {
+                unit = 'kg';
+                mpu = 13;
               } else if (newName === 'パスタ' || newName === '乾麺うどん') {
                 unit = '束';
                 mpu = 1;
@@ -461,6 +466,10 @@
               } else if (newName === 'スティックコーヒー・紅茶') {
                 unit = '本';
                 mpu = 1;
+              } else if (newName === '乾電池（単3形）') {
+                newName = '乾電池・単3形';
+              } else if (newName === 'ごみ袋（45L）') {
+                newName = 'ごみ袋・45L';
               }
 
               if (isComb && Array.isArray(old.variants)) {
@@ -506,7 +515,6 @@
               }
             });
 
-            // 移動・分離が行われたカテゴリーの合計配分を100%に整える
             ['staple', 'protein', 'vegetable', 'fruit_dairy', 'soup_other', 'snacks'].forEach(cId => {
               normalizeCategoryRatiosQuiet(migratedItems, cId);
             });
@@ -851,21 +859,24 @@
       const foodCats = CATEGORIES.filter(c => c.type === 'food');
       const supplyCats = CATEGORIES.filter(c => c.type === 'supply');
 
-      let urgentExpiryCount = 0;
-      let soonExpiryCount = 0;
+      // 賞味期限間近・期限切れ一覧の抽出
+      const expiryAlerts = [];
       appState.items.forEach(item => {
         if (item.isCombined && Array.isArray(item.variants)) {
           item.variants.forEach(v => {
             const st = getExpiryStatus(v.expiry);
-            if (st && (st.level === 'expired' || st.level === 'urgent')) urgentExpiryCount++;
-            else if (st && st.level === 'soon') soonExpiryCount++;
+            if (st && (st.level === 'expired' || st.level === 'urgent' || st.level === 'soon')) {
+              expiryAlerts.push({ name: `${item.name}（${v.name}）`, expiry: v.expiry, status: st });
+            }
           });
         } else {
           const st = getExpiryStatus(item.expiry);
-          if (st && (st.level === 'expired' || st.level === 'urgent')) urgentExpiryCount++;
-          else if (st && st.level === 'soon') soonExpiryCount++;
+          if (st && (st.level === 'expired' || st.level === 'urgent' || st.level === 'soon')) {
+            expiryAlerts.push({ name: item.name, expiry: item.expiry, status: st });
+          }
         }
       });
+      expiryAlerts.sort((a, b) => new Date(a.expiry) - new Date(b.expiry));
 
       const buildCategoryCard = (cat) => {
         const summary = getCategorySummary(cat.id);
@@ -901,7 +912,7 @@
         }
 
         return `
-          <button onclick="switchTab('inventory', '${cat.id}')" class="w-full ${cardStyle} p-3.5 rounded-2xl border shadow-2xs transition flex items-center justify-between gap-2 text-left active:scale-[0.99] min-w-0">
+          <button type="button" onclick="switchTab('inventory', '${cat.id}')" class="w-full ${cardStyle} p-3.5 rounded-2xl border shadow-2xs transition flex items-center justify-between gap-2 text-left active:scale-[0.99] min-w-0">
             <div class="flex items-center gap-3 min-w-0">
               <div class="w-10 h-10 rounded-xl ${iconBoxStyle} flex items-center justify-center shrink-0">
                 <i data-lucide="${cat.icon}" class="w-5 h-5"></i>
@@ -919,6 +930,32 @@
         `;
       };
 
+      const expiryAlertsHtml = expiryAlerts.length > 0 ? `
+        <section class="bg-amber-50/90 border border-amber-300/80 rounded-2xl p-4 shadow-2xs space-y-2.5">
+          <div class="flex items-center justify-between gap-2">
+            <div class="flex items-center gap-2 text-amber-900 font-bold text-sm">
+              <i data-lucide="alert-circle" class="w-4 h-4 text-[#C87D28] shrink-0"></i>
+              <span>賞味期限アラート（${expiryAlerts.length}件）</span>
+            </div>
+            <button type="button" onclick="switchTab('expiry')" class="text-xs font-bold text-[#C87D28] hover:underline flex items-center gap-0.5 whitespace-nowrap">
+              <span>すべて見る</span>
+              <i data-lucide="chevron-right" class="w-3.5 h-3.5"></i>
+            </button>
+          </div>
+          <div class="divide-y divide-amber-200/60 bg-white/80 rounded-xl px-3 border border-amber-200/60">
+            ${expiryAlerts.slice(0, 4).map(al => `
+              <div class="py-2 flex items-center justify-between gap-2 text-xs min-w-0">
+                <span class="font-bold text-stone-800 truncate">${al.name}</span>
+                <div class="flex items-center gap-1.5 shrink-0">
+                  <span class="text-stone-500 whitespace-nowrap">${al.expiry}</span>
+                  <span class="px-2 py-0.5 rounded-full text-[10px] font-bold border whitespace-nowrap ${al.status.badgeClass}">${al.status.label}</span>
+                </div>
+              </div>
+            `).join('')}
+          </div>
+        </section>
+      ` : '';
+
       container.innerHTML = `
         <div class="space-y-5 animate-fade-in min-w-0">
           <!-- 総合備蓄充足ゲージ -->
@@ -930,14 +967,14 @@
                   <span class="text-4xl font-bold tracking-tight">${baseMeals}</span>
                   <span class="text-base font-medium text-emerald-100">食</span>
                   <span class="ml-1 text-xs font-bold bg-white/15 px-2.5 py-0.5 rounded-full text-emerald-50 whitespace-nowrap">
-                    総合充足率 ${totalRate}%
+                    総合達成率 ${totalRate}%
                   </span>
                 </div>
                 <p class="text-xs text-emerald-100/90 mt-1">
                   ${people}人 × ${days}日 × 1日${mealsPerDay}食（設定で変更可）
                 </p>
               </div>
-              <button onclick="switchTab('settings')" class="p-2.5 rounded-2xl bg-white/10 hover:bg-white/20 text-white transition shrink-0" aria-label="設定">
+              <button type="button" onclick="switchTab('settings')" class="p-2.5 rounded-2xl bg-white/10 hover:bg-white/20 text-white transition shrink-0" aria-label="設定">
                 <i data-lucide="sliders-horizontal" class="w-5 h-5"></i>
               </button>
             </div>
@@ -977,28 +1014,12 @@
             </div>
           </section>
 
-          <!-- 期限アラートサマリー -->
-          ${(urgentExpiryCount > 0 || soonExpiryCount > 0) ? `
-            <button onclick="switchTab('expiry')" class="w-full bg-amber-50 border border-amber-300/80 rounded-2xl p-3.5 flex items-center justify-between gap-2 text-left shadow-2xs hover:bg-amber-100/60 transition">
-              <div class="flex items-center gap-2.5 min-w-0">
-                <div class="w-9 h-9 rounded-xl bg-amber-100 text-[#C87D28] flex items-center justify-center shrink-0">
-                  <i data-lucide="alert-circle" class="w-5 h-5"></i>
-                </div>
-                <div class="min-w-0">
-                  <div class="text-xs font-bold text-amber-900">賞味期限アラート</div>
-                  <div class="text-[11px] text-amber-800 mt-0.5">
-                    ${urgentExpiryCount > 0 ? `期限切れ・30日以内: ${urgentExpiryCount}件 ` : ''}
-                    ${soonExpiryCount > 0 ? `90日以内: ${soonExpiryCount}件` : ''}
-                  </div>
-                </div>
-              </div>
-              <i data-lucide="chevron-right" class="w-4 h-4 text-amber-600 shrink-0"></i>
-            </button>
-          ` : ''}
+          <!-- 賞味期限間近・期限切れアラート一覧 -->
+          ${expiryAlertsHtml}
 
           <!-- クイックアクション -->
           <div class="grid grid-cols-2 gap-3">
-            <button onclick="switchTab('shopping')" class="bg-white p-3.5 rounded-2xl border border-stone-200/80 shadow-2xs flex items-center justify-between gap-2 hover:border-emerald-300 transition text-left min-w-0">
+            <button type="button" onclick="switchTab('shopping')" class="bg-white p-3.5 rounded-2xl border border-stone-200/80 shadow-2xs flex items-center justify-between gap-2 hover:border-emerald-300 transition text-left min-w-0">
               <div class="flex items-center gap-2.5 min-w-0">
                 <div class="w-10 h-10 rounded-xl bg-rose-50 text-rose-600 flex items-center justify-center shrink-0">
                   <i data-lucide="shopping-bag" class="w-5 h-5"></i>
@@ -1009,7 +1030,7 @@
                 </div>
               </div>
             </button>
-            <button onclick="switchTab('expiry')" class="bg-white p-3.5 rounded-2xl border border-stone-200/80 shadow-2xs flex items-center justify-between gap-2 hover:border-emerald-300 transition text-left min-w-0">
+            <button type="button" onclick="switchTab('expiry')" class="bg-white p-3.5 rounded-2xl border border-stone-200/80 shadow-2xs flex items-center justify-between gap-2 hover:border-emerald-300 transition text-left min-w-0">
               <div class="flex items-center gap-2.5 min-w-0">
                 <div class="w-10 h-10 rounded-xl bg-amber-50 text-[#C87D28] flex items-center justify-center shrink-0">
                   <i data-lucide="clock" class="w-5 h-5"></i>
@@ -1068,7 +1089,7 @@
         : 'bg-white text-stone-600 border border-stone-200 hover:bg-stone-50';
 
       const tabsHtml = `
-        <button onclick="switchTab('inventory', 'all')"
+        <button type="button" onclick="switchTab('inventory', 'all')"
           class="px-3.5 py-2 rounded-full text-xs font-bold whitespace-nowrap transition shrink-0 ${allTabStyle}">
           すべて
         </button>
@@ -1093,7 +1114,7 @@
           }
         }
         return `
-          <button onclick="switchTab('inventory', '${cat.id}')"
+          <button type="button" onclick="switchTab('inventory', '${cat.id}')"
             class="px-3.5 py-2 rounded-full text-xs font-bold whitespace-nowrap transition shrink-0 ${activeStyle}">
             ${cat.name}
           </button>
@@ -1141,7 +1162,7 @@
               </div>
               <div class="pt-2.5 border-t border-stone-200/60 flex items-center justify-between gap-2">
                 <span class="text-[11px] text-stone-500 leading-snug jp-wrap">${helperNote}</span>
-                <button onclick="jumpToCategoryAllocation('${activeCat.id}')" class="px-2.5 py-1 rounded-lg border ${allocBtnStyle} text-[11px] font-bold transition flex items-center gap-1 whitespace-nowrap shrink-0">
+                <button type="button" onclick="jumpToCategoryAllocation('${activeCat.id}')" class="px-2.5 py-1 rounded-lg border ${allocBtnStyle} text-[11px] font-bold transition flex items-center gap-1 whitespace-nowrap shrink-0">
                   <i data-lucide="sliders" class="w-3 h-3 shrink-0"></i>
                   <span>配分調整</span>
                 </button>
@@ -1175,6 +1196,7 @@
           ? `<span class="text-[10px] font-bold px-2 py-0.5 rounded-md bg-stone-100 text-stone-600 whitespace-nowrap shrink-0">${catObj.name}</span>`
           : '';
 
+        // 複数サイズ・規格の合算カード（飲料水など）
         if (st.isCombined) {
           let cardBorder = 'border-emerald-300/85';
           let badgeBg = 'bg-emerald-100 text-[#1B6B50]';
@@ -1224,10 +1246,10 @@
                     </div>
                   </div>
                   <div class="flex items-center bg-white rounded-xl p-1 border border-stone-200 shrink-0 shadow-2xs">
-                    <button onclick="adjustVariantStock('${item.id}', '${v.id}', -${v.step || 1})" class="w-8 h-8 rounded-lg bg-stone-50 text-stone-700 font-bold flex items-center justify-center hover:bg-stone-100 active:scale-90 transition shrink-0" aria-label="減らす">
+                    <button type="button" onclick="adjustVariantStock('${item.id}', '${v.id}', -${v.step || 1})" class="w-8 h-8 rounded-lg bg-stone-50 text-stone-700 font-bold flex items-center justify-center hover:bg-stone-100 active:scale-90 transition shrink-0" aria-label="減らす">
                       <i data-lucide="minus" class="w-4 h-4"></i>
                     </button>
-                    <button onclick="adjustVariantStock('${item.id}', '${v.id}', ${v.step || 1})" class="w-8 h-8 rounded-lg ${plusBg} text-white font-bold flex items-center justify-center ml-1 active:scale-90 transition shrink-0" aria-label="増やす">
+                    <button type="button" onclick="adjustVariantStock('${item.id}', '${v.id}', ${v.step || 1})" class="w-8 h-8 rounded-lg ${plusBg} text-white font-bold flex items-center justify-center ml-1 active:scale-90 transition shrink-0" aria-label="増やす">
                       <i data-lucide="plus" class="w-4 h-4"></i>
                     </button>
                   </div>
@@ -1236,10 +1258,10 @@
                 <!-- 規格ごとのインライン賞味期限＆クリアボタン -->
                 <div class="flex items-center gap-1.5 pt-1 border-t border-black/5 min-w-0">
                   <span class="text-[11px] text-stone-500 whitespace-nowrap shrink-0">期限:</span>
-                  <input type="date" value="${v.expiry || ''}" onchange="updateVariantExpiryInline('${item.id}', '${v.id}', this.value)"
+                  <input type="date" id="date-variant-${item.id}-${v.id}" value="${v.expiry || ''}" onchange="updateVariantExpiryInline('${item.id}', '${v.id}', this.value)"
                     class="flex-1 min-w-0 bg-white border border-stone-200 rounded-lg px-2 py-1 text-xs font-medium text-stone-700">
-                  <button type="button" onclick="clearVariantExpiry('${item.id}', '${v.id}')"
-                    class="px-2 py-1 rounded-lg bg-white hover:bg-rose-50 text-stone-500 hover:text-rose-600 border border-stone-200 text-[11px] font-bold whitespace-nowrap shrink-0 transition">
+                  <button type="button" onclick="event.stopPropagation(); clearVariantExpiry('${item.id}', '${v.id}', this)"
+                    class="relative z-10 px-2.5 py-1.5 rounded-lg bg-white hover:bg-rose-50 active:bg-rose-100 text-stone-600 hover:text-rose-600 border border-stone-200 text-[11px] font-bold whitespace-nowrap shrink-0 transition cursor-pointer">
                     × クリア
                   </button>
                 </div>
@@ -1251,7 +1273,7 @@
             ? `
               <div class="text-[11px] text-stone-400 pt-1.5 border-t border-stone-100 flex items-center justify-between gap-2">
                 <span class="whitespace-nowrap">複数規格の合算管理</span>
-                <button onclick="jumpToCategoryAllocation('${item.category}')" class="${accentText} font-medium hover:underline whitespace-nowrap shrink-0">
+                <button type="button" onclick="jumpToCategoryAllocation('${item.category}')" class="${accentText} font-medium hover:underline whitespace-nowrap shrink-0">
                   配分比率：${item.ratio || 0}%（変更）
                 </button>
               </div>
@@ -1281,7 +1303,7 @@
                     </div>
                   </div>
                 </div>
-                <button onclick="openItemModal('${item.id}')" class="text-[11px] ${accentText} font-bold bg-stone-50 hover:bg-stone-100 border border-stone-200 px-2.5 py-1.5 rounded-xl flex items-center gap-1 whitespace-nowrap shrink-0">
+                <button type="button" onclick="openItemModal('${item.id}')" class="text-[11px] ${accentText} font-bold bg-stone-50 hover:bg-stone-100 border border-stone-200 px-2.5 py-1.5 rounded-xl flex items-center gap-1 whitespace-nowrap shrink-0">
                   <i data-lucide="edit-3" class="w-3 h-3 shrink-0"></i>
                   <span>編集</span>
                 </button>
@@ -1341,7 +1363,7 @@
             </div>
             <div class="text-[11px] text-stone-400 mt-1.5 flex items-center justify-between gap-2">
               <span class="truncate">換算基準：1${item.unit} ＝ ${formatNum(item.mealsPerUnit)}${unitMealFullText}</span>
-              <button onclick="jumpToCategoryAllocation('${item.category}')" class="${shareLinkColor} font-medium hover:underline whitespace-nowrap shrink-0">
+              <button type="button" onclick="jumpToCategoryAllocation('${item.category}')" class="${shareLinkColor} font-medium hover:underline whitespace-nowrap shrink-0">
                 配分比率：${item.ratio || 0}%（変更）
               </button>
             </div>
@@ -1389,14 +1411,14 @@
 
               <div class="flex flex-col items-end gap-2 shrink-0">
                 <div class="flex items-center bg-stone-100 rounded-xl p-1 border border-stone-200/70">
-                  <button onclick="adjustStock('${item.id}', -${item.step || 1})" class="w-8 h-8 rounded-lg bg-white text-stone-700 font-bold shadow-2xs flex items-center justify-center hover:bg-stone-50 active:scale-90 transition shrink-0" aria-label="減らす">
+                  <button type="button" onclick="adjustStock('${item.id}', -${item.step || 1})" class="w-8 h-8 rounded-lg bg-white text-stone-700 font-bold shadow-2xs flex items-center justify-center hover:bg-stone-50 active:scale-90 transition shrink-0" aria-label="減らす">
                     <i data-lucide="minus" class="w-4 h-4"></i>
                   </button>
-                  <button onclick="adjustStock('${item.id}', ${item.step || 1})" class="w-8 h-8 rounded-lg ${plusBtnColor} text-white font-bold shadow-2xs flex items-center justify-center ml-1 active:scale-90 transition shrink-0" aria-label="増やす">
+                  <button type="button" onclick="adjustStock('${item.id}', ${item.step || 1})" class="w-8 h-8 rounded-lg ${plusBtnColor} text-white font-bold shadow-2xs flex items-center justify-center ml-1 active:scale-90 transition shrink-0" aria-label="増やす">
                     <i data-lucide="plus" class="w-4 h-4"></i>
                   </button>
                 </div>
-                <button onclick="openItemModal('${item.id}')" class="text-[11px] text-stone-500 hover:text-[#1B6B50] flex items-center gap-0.5 px-1 whitespace-nowrap">
+                <button type="button" onclick="openItemModal('${item.id}')" class="text-[11px] text-stone-500 hover:text-[#1B6B50] flex items-center gap-0.5 px-1 whitespace-nowrap">
                   <i data-lucide="edit-3" class="w-3 h-3 shrink-0"></i>詳細・編集
                 </button>
               </div>
@@ -1405,10 +1427,10 @@
             <!-- インライン賞味期限ピッカー＆クリアボタン -->
             <div class="mt-2.5 pt-2.5 border-t border-stone-100 flex items-center gap-1.5 min-w-0">
               <span class="text-[11px] text-stone-500 whitespace-nowrap shrink-0">期限:</span>
-              <input type="date" value="${item.expiry || ''}" onchange="updateItemExpiryInline('${item.id}', this.value)"
+              <input type="date" id="date-item-${item.id}" value="${item.expiry || ''}" onchange="updateItemExpiryInline('${item.id}', this.value)"
                 class="flex-1 min-w-0 bg-stone-50 border border-stone-200 rounded-lg px-2 py-1 text-xs font-medium text-stone-700">
-              <button type="button" onclick="clearItemExpiry('${item.id}')"
-                class="px-2 py-1 rounded-lg bg-stone-50 hover:bg-rose-50 text-stone-500 hover:text-rose-600 border border-stone-200 text-[11px] font-bold whitespace-nowrap shrink-0 transition">
+              <button type="button" onclick="event.stopPropagation(); clearItemExpiry('${item.id}', this)"
+                class="relative z-10 px-2.5 py-1.5 rounded-lg bg-stone-50 hover:bg-rose-50 active:bg-rose-100 text-stone-600 hover:text-rose-600 border border-stone-200 text-[11px] font-bold whitespace-nowrap shrink-0 transition cursor-pointer">
                 × クリア
               </button>
             </div>
@@ -1443,7 +1465,7 @@
             ${itemsHtml}
           </div>
 
-          <button onclick="openItemModal(null, '${addTargetCatId}')" class="w-full py-3.5 rounded-2xl border-2 border-dashed ${addBtnStyle} font-bold text-sm transition flex items-center justify-center gap-2 whitespace-nowrap">
+          <button type="button" onclick="openItemModal(null, '${addTargetCatId}')" class="w-full py-3.5 rounded-2xl border-2 border-dashed ${addBtnStyle} font-bold text-sm transition flex items-center justify-center gap-2 whitespace-nowrap">
             <i data-lucide="plus-circle" class="w-5 h-5 shrink-0"></i>
             <span>${addTargetLabel}</span>
           </button>
@@ -1475,7 +1497,7 @@
       item.expiry = dateVal || '';
       saveData();
       renderCurrentView();
-      if (dateVal) showToast(`「${item.name}」の賞味期限を設定しました`);
+      showToast(dateVal ? `「${item.name}」の賞味期限を更新しました` : `「${item.name}」の賞味期限をクリアしました`);
     }
 
     function updateVariantExpiryInline(itemId, variantId, dateVal) {
@@ -1486,24 +1508,48 @@
       variant.expiry = dateVal || '';
       saveData();
       renderCurrentView();
-      if (dateVal) showToast(`「${item.name}（${variant.name}）」の賞味期限を設定しました`);
+      showToast(dateVal ? `「${item.name}（${variant.name}）」の賞味期限を更新しました` : `「${item.name}（${variant.name}）」の賞味期限をクリアしました`);
     }
 
-    function clearItemExpiry(itemId) {
+    function clearItemExpiry(itemId, btnEl) {
       const item = appState.items.find(i => i.id === itemId);
       if (!item) return;
       item.expiry = '';
+      if (btnEl && btnEl.parentElement) {
+        const inputEl = btnEl.parentElement.querySelector('input[type="date"]');
+        if (inputEl) {
+          inputEl.value = '';
+          inputEl.defaultValue = '';
+        }
+      }
+      const directEl = document.getElementById(`date-item-${itemId}`);
+      if (directEl) {
+        directEl.value = '';
+        directEl.defaultValue = '';
+      }
       saveData();
       renderCurrentView();
       showToast(`「${item.name}」の賞味期限をクリアしました`);
     }
 
-    function clearVariantExpiry(itemId, variantId) {
+    function clearVariantExpiry(itemId, variantId, btnEl) {
       const item = appState.items.find(i => i.id === itemId);
       if (!item || !Array.isArray(item.variants)) return;
       const variant = item.variants.find(v => v.id === variantId);
       if (!variant) return;
       variant.expiry = '';
+      if (btnEl && btnEl.parentElement) {
+        const inputEl = btnEl.parentElement.querySelector('input[type="date"]');
+        if (inputEl) {
+          inputEl.value = '';
+          inputEl.defaultValue = '';
+        }
+      }
+      const directEl = document.getElementById(`date-variant-${itemId}-${variantId}`);
+      if (directEl) {
+        directEl.value = '';
+        directEl.defaultValue = '';
+      }
       saveData();
       renderCurrentView();
       showToast(`「${item.name}（${variant.name}）」の賞味期限をクリアしました`);
@@ -1572,8 +1618,8 @@
             : `updateItemExpiryInline('${entry.itemId}', this.value)`;
 
           const clearAction = entry.variantId
-            ? `clearVariantExpiry('${entry.itemId}', '${entry.variantId}')`
-            : `clearItemExpiry('${entry.itemId}')`;
+            ? `event.stopPropagation(); clearVariantExpiry('${entry.itemId}', '${entry.variantId}', this)`
+            : `event.stopPropagation(); clearItemExpiry('${entry.itemId}', this)`;
 
           return `
             <div class="bg-white p-4 rounded-2xl border border-stone-200/80 shadow-2xs space-y-2.5 min-w-0">
@@ -1595,7 +1641,7 @@
                 <input type="date" value="${entry.expiry}" onchange="${dateChangeAction}"
                   class="flex-1 min-w-0 bg-stone-50 border border-stone-200 rounded-lg px-2.5 py-1.5 text-xs font-medium text-stone-800">
                 <button type="button" onclick="${clearAction}"
-                  class="px-2.5 py-1.5 rounded-lg bg-stone-50 hover:bg-rose-50 text-stone-500 hover:text-rose-600 border border-stone-200 text-xs font-bold whitespace-nowrap shrink-0 transition">
+                  class="relative z-10 px-2.5 py-1.5 rounded-lg bg-stone-50 hover:bg-rose-50 active:bg-rose-100 text-stone-600 hover:text-rose-600 border border-stone-200 text-xs font-bold whitespace-nowrap shrink-0 transition cursor-pointer">
                   × クリア
                 </button>
               </div>
@@ -1757,7 +1803,7 @@
             `;
           }
 
-          // 通常品目（375pxでも右端が絶対に切れない1行ステッパー）
+          // 通常品目（狭いスマホ画面でも1行に収まるステッパー）
           const needQty = formatNum(needQtyNum);
           const stepVal = item.step || (Number.isInteger(needQtyNum) ? 1 : 0.5);
 
@@ -2000,7 +2046,7 @@
         const labelColor = isAmber ? 'text-[#C87D28]' : 'text-[#1B6B50]';
         const rangeClass = isAmber ? 'range-amber' : '';
 
-        // お菓子・嗜好品のみ「日分」表示を完全除外
+        // お菓子・嗜好品だけは「何日分」の表記を一切入れず回数ベースのみ表示
         const rightLabelHtml = isSnacks
           ? `${ratio}%（必要 ${targetMeals}回分）`
           : `${ratio}%（約${eqDays}日分 / ${targetMeals}食）`;
@@ -2192,7 +2238,7 @@
                 </span>
               </div>
 
-              <!-- 3段目：100%ステータスバッジ＋自動調整ボタン -->
+              <!-- 3段目：達成%バッジ＋自動調整ボタン -->
               <div class="pt-2 border-t border-black/10 flex flex-wrap items-center justify-between gap-2">
                 <span id="alloc-total-badge" class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold whitespace-nowrap shrink-0 ${
                   isExactly100
@@ -2226,7 +2272,7 @@
             </div>
 
             <div class="grid grid-cols-2 gap-2.5">
-              <button onclick="exportJsonBackup()" class="py-3 px-3 rounded-2xl bg-[#1B6B50] text-white font-bold text-xs hover:bg-emerald-900 transition flex items-center justify-center gap-1.5 shadow-2xs whitespace-nowrap">
+              <button type="button" onclick="exportJsonBackup()" class="py-3 px-3 rounded-2xl bg-[#1B6B50] text-white font-bold text-xs hover:bg-emerald-900 transition flex items-center justify-center gap-1.5 shadow-2xs whitespace-nowrap">
                 <i data-lucide="download" class="w-4 h-4 shrink-0"></i>
                 <span>JSON書き出し</span>
               </button>
@@ -2238,7 +2284,7 @@
             </div>
 
             <div class="pt-2 border-t border-stone-100">
-              <button onclick="confirmResetData()" class="w-full py-2.5 px-4 rounded-xl text-rose-600 text-xs font-bold hover:bg-rose-50 transition flex items-center justify-center gap-1.5 whitespace-nowrap">
+              <button type="button" onclick="confirmResetData()" class="w-full py-2.5 px-4 rounded-xl text-rose-600 text-xs font-bold hover:bg-rose-50 transition flex items-center justify-center gap-1.5 whitespace-nowrap">
                 <i data-lucide="rotate-ccw" class="w-3.5 h-3.5 shrink-0"></i>
                 <span>初期データにリセットする</span>
               </button>
@@ -2283,15 +2329,11 @@
 
       const totalBadge = document.getElementById('alloc-total-badge');
       if (totalBadge) {
-        totalBadge.textContent = `${totalShareSumDisplay(totalSum)}`;
+        totalBadge.textContent = `${totalSum}%${totalSum === 100 ? '（ぴったり）' : ''}`;
         totalBadge.className = `inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold whitespace-nowrap shrink-0 ${
           totalSum === 100 ? 'bg-emerald-200/80 text-[#1B6B50]' : 'bg-amber-200/80 text-amber-900'
         }`;
       }
-    }
-
-    function totalShareSumDisplay(sum) {
-      return `${sum}%${sum === 100 ? '（ぴったり）' : ''}`;
     }
 
     function normalizeCategoryShares(catId) {
@@ -2510,7 +2552,7 @@
               </div>
             </div>
 
-            <!-- クイック単位チップ -->
+            <!-- クイック単位選択チップ -->
             <div class="flex flex-wrap items-center gap-1.5 -mt-1.5">
               <span class="text-[11px] text-stone-400 mr-0.5">単位選択：</span>
               ${['個', '枚', '本', '束', '缶', '袋', '食', 'kg', 'L'].map(u => `
@@ -2539,8 +2581,8 @@
               <div class="flex items-center gap-2 min-w-0">
                 <input type="date" name="expiry" id="single-expiry-input" value="${item.expiry || ''}"
                   class="flex-1 min-w-0 bg-stone-50 border border-stone-300 rounded-xl px-3 py-2.5 font-medium text-stone-800">
-                <button type="button" onclick="document.getElementById('single-expiry-input').value=''"
-                  class="px-3 py-2.5 rounded-xl bg-stone-100 hover:bg-rose-50 text-stone-600 hover:text-rose-600 border border-stone-200 text-xs font-bold whitespace-nowrap shrink-0 transition">
+                <button type="button" onclick="event.stopPropagation(); clearSingleModalExpiry()"
+                  class="relative z-10 px-3 py-2.5 rounded-xl bg-stone-100 hover:bg-rose-50 active:bg-rose-100 text-stone-600 hover:text-rose-600 border border-stone-200 text-xs font-bold whitespace-nowrap shrink-0 transition cursor-pointer">
                   × クリア
                 </button>
               </div>
@@ -2660,6 +2702,15 @@
       renderModalVariantsList();
     }
 
+    function updateDraftVariant(index, field, value) {
+      if (!modalDraftVariants[index]) return;
+      if (field === 'factor' || field === 'stock') {
+        modalDraftVariants[index][field] = parseFloat(value) || 0;
+      } else {
+        modalDraftVariants[index][field] = value;
+      }
+    }
+
     function renderModalVariantsList() {
       const container = document.getElementById('modal-variants-container');
       if (!container) return;
@@ -2707,8 +2758,8 @@
               <input type="date" id="draft-variant-expiry-${idx}" value="${v.expiry || ''}"
                 oninput="updateDraftVariant(${idx}, 'expiry', this.value)"
                 class="flex-1 min-w-0 bg-white border border-stone-300 rounded-xl px-2.5 py-1.5 font-medium text-stone-800">
-              <button type="button" onclick="clearDraftVariantExpiry(${idx})"
-                class="px-2.5 py-1.5 rounded-xl bg-white hover:bg-rose-50 text-stone-600 hover:text-rose-600 border border-stone-300 text-xs font-bold whitespace-nowrap shrink-0 transition">
+              <button type="button" onclick="event.stopPropagation(); clearDraftVariantExpiry(${idx})"
+                class="relative z-10 px-2.5 py-1.5 rounded-xl bg-white hover:bg-rose-50 active:bg-rose-100 text-stone-600 hover:text-rose-600 border border-stone-300 text-xs font-bold whitespace-nowrap shrink-0 transition cursor-pointer">
                 × クリア
               </button>
             </div>
@@ -2717,22 +2768,21 @@
       `).join('');
     }
 
+    function clearSingleModalExpiry() {
+      const el = document.getElementById('single-expiry-input');
+      if (el) {
+        el.value = '';
+        el.defaultValue = '';
+      }
+    }
+
     function clearDraftVariantExpiry(index) {
       if (!modalDraftVariants[index]) return;
       modalDraftVariants[index].expiry = '';
       const el = document.getElementById(`draft-variant-expiry-${index}`);
-      if (el) el.value = '';
-    }
-
-    function updateDraftVariant(index, field, value) {
-      if (!modalDraftVariants[index]) return;
-      if (field === 'factor' || field === 'stock') {
-        modalDraftVariants[index][field] = parseFloat(value) || 0;
-      } else {
-        modalDraftVariants[index][field] = value;
-      }
-      if (field === 'unit') {
-        renderModalVariantsList();
+      if (el) {
+        el.value = '';
+        el.defaultValue = '';
       }
     }
 
